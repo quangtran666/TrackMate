@@ -1,13 +1,14 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import "../global.css";
 import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider/index";
+import { ClerkProvider } from "@clerk/clerk-expo";
 
 export default function RootLayout() {
   return (
-    <GluestackUIProvider mode="light">
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </GluestackUIProvider>
+    <ClerkProvider>
+      <GluestackUIProvider mode="light">
+        <Slot />
+      </GluestackUIProvider>
+    </ClerkProvider>
   );
 }

@@ -1,13 +1,13 @@
 {
-  "tailwindCSS.classAttributes": [
-    "class",
-    "className",
-    "headerClassName"
-  ],
+  "tailwindCSS.classAttributes": ["class", "className", "headerClassName"],
   "tailwindCSS.experimental.classRegex": [
-    [
-      "tva\\((([^()]*|\\([^()]*\\))*)\\)",
-      "[\"'`]([^\"'`]*).*?[\"'`]"
-    ]
+    ["tva\\((([^()]*|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.codeActionsOnSave.rules": [
+    "unused-imports/no-unused-imports",
+    "unused-imports/no-unused-vars"
   ]
 }
