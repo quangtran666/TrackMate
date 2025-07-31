@@ -1,0 +1,119 @@
+package handlers
+
+import (
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/quangtran666/TrackMate/internal/config"
+	"github.com/quangtran666/TrackMate/internal/middleware"
+)
+
+type Handler struct {
+	DB             *config.Database
+	Router         *gin.Engine
+	AuthMiddleware *middleware.AuthMiddleware
+}
+
+func NewHandler(db *config.Database, cfg *config.Config) *Handler {
+	gin.SetMode(gin.ReleaseMode)
+
+	authMiddleware := middleware.NewAuthMiddleware(cfg.GetClerkSecretKey())
+
+	h := &Handler{
+		DB:             db,
+		Router:         gin.Default(),
+		AuthMiddleware: authMiddleware,
+	}
+
+	h.SetupRoutes()
+	return h
+}
+
+func (h *Handler) SetupRoutes() {
+	h.Router.GET("/health", h.HealthCheck)
+
+	v1 := h.Router.Group("/api/v1")
+
+	protected := v1.Group("/protected")
+	protected.Use(h.AuthMiddleware.RequireAuth())
+	{
+
+	}
+}
+
+func (h *Handler) HealthCheck(c *gin.Context) {
+	h.SuccessResponse(c, "Server is running", nil)
+}
+
+type Response struct {
+	Success   bool        `json:"success"`
+	Message   string      `json:"message"`
+	Data      interface{} `json:"data,omitempty"`
+	Timestamp time.Time   `json:"timestamp"`
+}
+
+type ErrorResponse struct {
+	Success   bool      `json:"success"`
+	Message   string    `json:"message"`
+	Error     string    `json:"error"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+func (h *Handler) SuccessResponse(c *gin.Context, message string, data interface{}) {
+	c.JSON(http.StatusOK, Response{
+		Success:   true,
+		Message:   message,
+		Data:      data,
+		Timestamp: time.Now(),
+	})
+}
+
+func (h *Handler) CreatedResponse(c *gin.Context, message string, data interface{}, resourcePath string) {
+	c.Header("Location", resourcePath)
+
+	c.JSON(http.StatusCreated, Response{
+		Success:   true,
+		Message:   message,
+		Data:      data,
+		Timestamp: time.Now(),
+	})
+}
+
+func (h *Handler) ErrorResponse(c *gin.Context, statusCode int, message string, err error) {
+	errorDetail := ""
+	if err != nil {
+		errorDetail = err.Error()
+	}
+
+	c.JSON(statusCode, ErrorResponse{
+		Success:   false,
+		Message:   message,
+		Error:     errorDetail,
+		Timestamp: time.Now(),
+	})
+}
+
+func (h *Handler) BadRequestResponse(c *gin.Context, message string, err error) {
+	h.ErrorResponse(c, http.StatusBadRequest, message, err)
+}
+
+func (h *Handler) NotFoundResponse(c *gin.Context, message string, err error) {
+	h.ErrorResponse(c, http.StatusNotFound, message, err)
+}
+
+func (h *Handler) UnauthorizedResponse(c *gin.Context, message string, err error) {
+	h.ErrorResponse(c, http.StatusUnauthorized, message, err)
+}
+
+func (h *Handler) ForbiddenResponse(c *gin.Context, message string, err error) {
+	h.ErrorResponse(c, http.StatusForbidden, message, err)
+}
+
+func (h *Handler) InternalServerErrorResponse(c *gin.Context, message string, err error) {
+	h.ErrorResponse(c, http.StatusInternalServerError, message, err)
+}
+
+func (h *Handler) BuildResourcePath(basePath, id string) string {
+	return basePath + "/" + id
+}
