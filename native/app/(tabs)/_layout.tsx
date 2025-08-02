@@ -1,13 +1,6 @@
-import { useAuth } from "@clerk/clerk-expo";
-import { Redirect, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 
 export default function TabsLayout() {
-  const { isSignedIn } = useAuth();
-
-  if (!isSignedIn) {
-    return <Redirect href={"/"} />;
-  }
-
   return (
     <Tabs
       screenOptions={{
