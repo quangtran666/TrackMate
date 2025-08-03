@@ -11,6 +11,7 @@ export default function SignInScreen() {
     const result = await ResultAsync.fromPromise(
       authorize({
         scope: "openid profile email offline_access",
+        audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
       }),
       (error) => error as Error,
     );

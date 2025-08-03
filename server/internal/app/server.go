@@ -33,25 +33,25 @@ func NewServer(cfg *config.Config, db *database.Database) *Server {
 }
 
 func (s *Server) setupMiddleware() {
-	s.router.Use(middleware.RequestLogger(s.config))
+	// s.router.Use(gin.Logger())
 }
 
 func (s *Server) setupRoutes() {
+	baseHandler := handlers.NewHandler(s.db, s.config)
+	s.router.GET("/health", baseHandler.HealthCheck)
 	api := s.router.Group("/api/v1")
 
-	// Initialize base handler
-	baseHandler := handlers.NewHandler(s.db, s.config)
-
-	// Initialize budget dependencies
-	budgetRepo := repository.NewBudgetRepository(s.db)
-	budgetUsecase := usecase.NewBudgetUsecase(budgetRepo)
-	budgetHandler := budget.NewBudgetHandler(budgetUsecase, baseHandler)
-
-	// Register routes
-	budget.RegisterBudgetRoutes(api, budgetHandler)
-
-	// Health check endpoint (moved from base handler to server level)
-	s.router.GET("/health", baseHandler.HealthCheck)
+	protected := api.Group("")
+	protected.Use(middleware.RequireAuth0(s.config))
+	{
+		protected.GET("/temp", func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "Hello from /temp"})
+		})
+		budgetRepo := repository.NewBudgetRepository(s.db)
+		budgetUsecase := usecase.NewBudgetUsecase(budgetRepo)
+		budgetHandler := budget.NewBudgetHandler(budgetUsecase, baseHandler)
+		budget.RegisterBudgetRoutes(protected, budgetHandler)
+	}
 }
 
 func (s *Server) Run() {
