@@ -8,6 +8,7 @@ module.exports = defineConfig([
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       'unused-imports': require('eslint-plugin-unused-imports'),
+      'neverthrow': require('eslint-plugin-neverthrow'),
     },
     rules: {
       'unused-imports/no-unused-imports': 'error',
@@ -21,6 +22,7 @@ module.exports = defineConfig([
         },
       ],
       'no-unused-vars': 'off',
+      'neverthrow/must-use-result': 'error',
     },
     ignores: ['dist/*'],
   },

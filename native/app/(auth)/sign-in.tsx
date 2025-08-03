@@ -1,27 +1,29 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth0 } from "react-native-auth0";
+import { ResultAsync } from "neverthrow";
+import { Link } from "expo-router";
 
 export default function SignInScreen() {
-  const { authorize, clearSession, user } = useAuth0();
+  const { authorize } = useAuth0();
 
   const onSignInPress = async () => {
-    try {
-      await authorize();
-    } catch (error) {
-      console.error("Sign in failed", error);
-    }
-  };
+    const result = await ResultAsync.fromPromise(
+      authorize({
+        scope: "openid profile email offline_access",
+      }),
+      (error) => error as Error,
+    );
 
-  const onSignOutPress = async () => {
-    try {
-      await clearSession();
-    } catch (error) {
-      console.error("Sign out failed", error);
-    }
+    result.match(
+      () => {
+        console.log("Sign in successful");
+      },
+      (error) => {
+        console.error("Sign in failed", error.message);
+      }
+    )
   };
-
-  console.log("User:", user);
 
   return (
     <VStack space="md">
@@ -32,15 +34,6 @@ export default function SignInScreen() {
         onPress={onSignInPress}
       >
         <ButtonText>Sign In</ButtonText>
-      </Button>
-
-      <Button
-        size="md"
-        variant="solid"
-        action="secondary"
-        onPress={onSignOutPress}
-      >
-        <ButtonText>Sign Out</ButtonText>
       </Button>
     </VStack>
   );

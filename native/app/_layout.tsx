@@ -1,7 +1,7 @@
-import { Slot } from "expo-router";
+import { Stack } from "expo-router";
 import "../global.css";
 import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider/index";
-import { Auth0Provider } from "react-native-auth0";
+import { Auth0Provider, useAuth0 } from "react-native-auth0";
 
 export default function RootLayout() {
   return (
@@ -10,7 +10,14 @@ export default function RootLayout() {
       clientId={process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID!}
     >
       <GluestackUIProvider mode="light">
-        <Slot />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="(protected)" />
+          <Stack.Screen name="(auth)" />
+        </Stack>
       </GluestackUIProvider>
     </Auth0Provider>
   );
