@@ -26,6 +26,7 @@ func NewDatabase(uri string) (*Database, error) {
 
 	err = client.Ping(ctx, nil)
 	if err != nil {
+		client.Disconnect(ctx)
 		return nil, fmt.Errorf("failed to ping MongoDB: %v", err)
 	}
 

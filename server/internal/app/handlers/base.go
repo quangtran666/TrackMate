@@ -67,7 +67,7 @@ func (h *Handler) CreatedResponse(c *gin.Context, message string, data interface
 
 func (h *Handler) ErrorResponse(c *gin.Context, statusCode int, message string, err error) {
 	errorDetail := ""
-	if err != nil {
+	if err != nil && !h.Config.IsProduction() {
 		errorDetail = err.Error()
 	}
 

@@ -60,5 +60,4 @@ func (s *Server) Run() {
 	if err := s.router.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-	log.Printf("Server is now running on %s", addr)
 }
