@@ -5,45 +5,30 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/quangtran666/TrackMate/internal/config"
-	"github.com/quangtran666/TrackMate/internal/middleware"
+	"github.com/quangtran666/TrackMate/config"
+	"github.com/quangtran666/TrackMate/internal/infrastructure/database"
 )
 
 type Handler struct {
-	DB             *config.Database
-	Router         *gin.Engine
-	AuthMiddleware *middleware.AuthMiddleware
+	DB     *database.Database
+	Router *gin.Engine
+	Config *config.Config
 }
 
-func NewHandler(db *config.Database, cfg *config.Config) *Handler {
-	gin.SetMode(gin.ReleaseMode)
-
-	authMiddleware := middleware.NewAuthMiddleware(cfg.GetClerkSecretKey())
+func NewHandler(db *database.Database, cfg *config.Config) *Handler {
+	if cfg.IsProduction() {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
 
 	h := &Handler{
-		DB:             db,
-		Router:         gin.Default(),
-		AuthMiddleware: authMiddleware,
+		DB:     db,
+		Router: gin.Default(),
+		Config: cfg,
 	}
 
-	h.SetupRoutes()
 	return h
-}
-
-func (h *Handler) SetupRoutes() {
-	h.Router.GET("/health", h.HealthCheck)
-
-	v1 := h.Router.Group("/api/v1")
-
-	protected := v1.Group("/protected")
-	protected.Use(h.AuthMiddleware.RequireAuth())
-	{
-
-	}
-}
-
-func (h *Handler) HealthCheck(c *gin.Context) {
-	h.SuccessResponse(c, "Server is running", nil)
 }
 
 type Response struct {
@@ -116,4 +101,11 @@ func (h *Handler) InternalServerErrorResponse(c *gin.Context, message string, er
 
 func (h *Handler) BuildResourcePath(basePath, id string) string {
 	return basePath + "/" + id
+}
+
+func (h *Handler) HealthCheck(c *gin.Context) {
+	h.SuccessResponse(c, "Server is running and healthy", gin.H{
+		"status":    "running",
+		"timestamp": time.Now(),
+	})
 }

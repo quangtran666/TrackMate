@@ -3,27 +3,30 @@ package main
 import (
 	"log"
 
-	"github.com/quangtran666/TrackMate/internal/config"
-	"github.com/quangtran666/TrackMate/internal/handlers"
+	"github.com/quangtran666/TrackMate/config"
+	"github.com/quangtran666/TrackMate/internal/app"
+	"github.com/quangtran666/TrackMate/internal/infrastructure/database"
 )
 
 func main() {
+	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Error loading configuration: %v", err)
 	}
 
-	db, err := config.NewDatabase(cfg.GetMongoDBURI())
+	// Connect to database
+	db, err := database.NewDatabase(cfg.GetMongoDBURI())
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 	defer db.Close()
 
-	baseHandler := handlers.NewHandler(db, cfg)
+	// Initialize server with dependency injection
+	server := app.NewServer(cfg, db)
 
-	log.Printf("Server is running at %s", cfg.GetServerAddress())
+	// Start server
+	log.Printf("Server is starting at %s", cfg.GetServerAddress())
 	log.Println("Successfully connected to MongoDB")
-	if err := baseHandler.Router.Run(cfg.GetServerAddress()); err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
+	server.Run()
 }

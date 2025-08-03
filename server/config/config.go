@@ -37,21 +37,16 @@ func LoadConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		MongoDBURI:     viper.GetString("MONGODB_URI"),
-		ServerPort:     viper.GetString("SERVER_PORT"),
-		ServerHost:     viper.GetString("SERVER_HOST"),
-		Environment:    viper.GetString("ENVIRONMENT"),
-		ClerkSecretKey: viper.GetString("CLERK_SECRET_KEY"),
+		MongoDBURI:  viper.GetString("MONGODB_URI"),
+		ServerPort:  viper.GetString("SERVER_PORT"),
+		ServerHost:  viper.GetString("SERVER_HOST"),
+		Environment: viper.GetString("ENVIRONMENT"),
 	}
 	return config, nil
 }
 
 func (c *Config) GetMongoDBURI() string {
 	return c.MongoDBURI
-}
-
-func (c *Config) GetClerkSecretKey() string {
-	return c.ClerkSecretKey
 }
 
 func (c *Config) GetServerAddress() string {
