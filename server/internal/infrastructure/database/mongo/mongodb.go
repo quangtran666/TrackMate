@@ -1,4 +1,4 @@
-package database
+package mongo
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-type Database struct {
+type MongoDatabase struct {
 	Client *mongo.Client
 	DB     *mongo.Database
 }
 
-func NewDatabase(uri string) (*Database, error) {
+func NewDatabase(uri string) (*MongoDatabase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -33,13 +33,13 @@ func NewDatabase(uri string) (*Database, error) {
 	db := client.Database("trackmate")
 
 	log.Println("Successfully connected to MongoDB")
-	return &Database{
+	return &MongoDatabase{
 		Client: client,
 		DB:     db,
 	}, nil
 }
 
-func (d *Database) Close() error {
+func (d *MongoDatabase) Close() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	return d.Client.Disconnect(ctx)

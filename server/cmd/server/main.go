@@ -5,7 +5,7 @@ import (
 
 	"github.com/quangtran666/TrackMate/config"
 	"github.com/quangtran666/TrackMate/internal/app"
-	"github.com/quangtran666/TrackMate/internal/infrastructure/database"
+	"github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	}
 
 	// Connect to database
-	db, err := database.NewDatabase(cfg.GetMongoDBURI())
+	db, err := mongo.NewDatabase(cfg.GetMongoDBURI())
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
 	}

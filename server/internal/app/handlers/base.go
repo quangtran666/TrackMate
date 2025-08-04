@@ -6,16 +6,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/quangtran666/TrackMate/config"
-	"github.com/quangtran666/TrackMate/internal/infrastructure/database"
+	"github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 )
 
 type Handler struct {
-	DB     *database.Database
+	DB     *mongo.MongoDatabase
 	Router *gin.Engine
 	Config *config.Config
 }
 
-func NewHandler(db *database.Database, cfg *config.Config) *Handler {
+func NewHandler(db *mongo.MongoDatabase, cfg *config.Config) *Handler {
 	if cfg.IsProduction() {
 		gin.SetMode(gin.ReleaseMode)
 	} else {

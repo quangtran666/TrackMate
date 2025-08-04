@@ -8,18 +8,18 @@ import (
 	"github.com/quangtran666/TrackMate/internal/app/handlers"
 	"github.com/quangtran666/TrackMate/internal/app/handlers/budget"
 	"github.com/quangtran666/TrackMate/internal/app/middleware"
-	"github.com/quangtran666/TrackMate/internal/infrastructure/database"
-	"github.com/quangtran666/TrackMate/internal/infrastructure/repository"
+	"github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
+	mongoRepo "github.com/quangtran666/TrackMate/internal/infrastructure/repository/mongo"
 	"github.com/quangtran666/TrackMate/internal/usecase"
 )
 
 type Server struct {
 	config *config.Config
-	db     *database.Database
+	db     *mongo.MongoDatabase
 	router *gin.Engine
 }
 
-func NewServer(cfg *config.Config, db *database.Database) *Server {
+func NewServer(cfg *config.Config, db *mongo.MongoDatabase) *Server {
 	server := &Server{
 		config: cfg,
 		db:     db,
@@ -33,7 +33,7 @@ func NewServer(cfg *config.Config, db *database.Database) *Server {
 }
 
 func (s *Server) setupMiddleware() {
-	// s.router.Use(gin.Logger())
+	s.router.Use(gin.Logger())
 }
 
 func (s *Server) setupRoutes() {
@@ -47,7 +47,7 @@ func (s *Server) setupRoutes() {
 		protected.GET("/temp", func(c *gin.Context) {
 			c.JSON(200, gin.H{"message": "Hello from /temp"})
 		})
-		budgetRepo := repository.NewBudgetRepository(s.db)
+		budgetRepo := mongoRepo.NewBudgetRepository(s.db)
 		budgetUsecase := usecase.NewBudgetUsecase(budgetRepo)
 		budgetHandler := budget.NewBudgetHandler(budgetUsecase, baseHandler)
 		budget.RegisterBudgetRoutes(protected, budgetHandler)
