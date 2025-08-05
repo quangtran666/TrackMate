@@ -5,22 +5,19 @@ import (
 
 	"github.com/quangtran666/TrackMate/internal/domain/entity"
 	"github.com/quangtran666/TrackMate/internal/domain/repository"
-	"github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
+	mongodb "github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 )
 
-// BudgetRepositoryImpl implements the BudgetRepository interface using MongoDB
 type BudgetRepositoryImpl struct {
-	db *mongo.MongoDatabase
+	db *mongodb.MongoDatabase
 }
 
-// NewBudgetRepository creates a new BudgetRepositoryImpl with database dependency
-func NewBudgetRepository(db *mongo.MongoDatabase) repository.BudgetRepository {
+func NewBudgetRepository(db *mongodb.MongoDatabase) repository.BudgetRepository {
 	return &BudgetRepositoryImpl{
 		db: db,
 	}
 }
 
-// Save implements the BudgetRepository Save method
 func (r *BudgetRepositoryImpl) Save(ctx context.Context, budget *entity.Budget) error {
 	panic("not implemented")
 }

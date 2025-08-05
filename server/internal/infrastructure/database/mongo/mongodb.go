@@ -10,6 +10,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
+var (
+	DatabaseName = "trackmate"
+)
+
 type MongoDatabase struct {
 	Client *mongo.Client
 	DB     *mongo.Database
@@ -30,7 +34,7 @@ func NewDatabase(uri string) (*MongoDatabase, error) {
 		return nil, fmt.Errorf("failed to ping MongoDB: %v", err)
 	}
 
-	db := client.Database("trackmate")
+	db := client.Database(DatabaseName)
 
 	log.Println("Successfully connected to MongoDB")
 	return &MongoDatabase{

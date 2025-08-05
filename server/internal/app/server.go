@@ -6,8 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/quangtran666/TrackMate/config"
 	"github.com/quangtran666/TrackMate/internal/app/handlers"
+	"github.com/quangtran666/TrackMate/internal/app/handlers/account"
 	"github.com/quangtran666/TrackMate/internal/app/handlers/budget"
 	"github.com/quangtran666/TrackMate/internal/app/middleware"
+	"github.com/quangtran666/TrackMate/internal/constants"
 	"github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 	mongoRepo "github.com/quangtran666/TrackMate/internal/infrastructure/repository/mongo"
 	"github.com/quangtran666/TrackMate/internal/usecase"
@@ -39,18 +41,20 @@ func (s *Server) setupMiddleware() {
 func (s *Server) setupRoutes() {
 	baseHandler := handlers.NewHandler(s.db, s.config)
 	s.router.GET("/health", baseHandler.HealthCheck)
-	api := s.router.Group("/api/v1")
+	api := s.router.Group(constants.BasePath)
 
 	protected := api.Group("")
 	protected.Use(middleware.RequireAuth0(s.config))
 	{
-		protected.GET("/temp", func(c *gin.Context) {
-			c.JSON(200, gin.H{"message": "Hello from /temp"})
-		})
 		budgetRepo := mongoRepo.NewBudgetRepository(s.db)
 		budgetUsecase := usecase.NewBudgetUsecase(budgetRepo)
 		budgetHandler := budget.NewBudgetHandler(budgetUsecase, baseHandler)
 		budget.RegisterBudgetRoutes(protected, budgetHandler)
+
+		accountRepo := mongoRepo.NewAccountRepository(s.db)
+		accountUsecase := usecase.NewAccountUsecase(accountRepo)
+		accountHandler := account.NewAccountHandler(accountUsecase, baseHandler)
+		account.RegisterAccountRoutes(protected, accountHandler)
 	}
 }
 

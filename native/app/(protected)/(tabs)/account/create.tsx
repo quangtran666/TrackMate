@@ -1,9 +1,11 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import CreateAccountForm from "@/components/account/CreateAccountForm";
+import CreateAccountForm from "@/features/account/CreateAccountForm";
+import { auth0 } from "@/config/auth0";
+import { AccountFormData } from "@/features/account/constants";
 
 export default function CreateAccountScreen() {
-  const onSubmit = (data: any) => {
-    console.log("Account created:", data);
+  const onSubmit = async (data: AccountFormData) => {
+    const credentials = await auth0.credentialsManager.getCredentials();
   };
 
   return (

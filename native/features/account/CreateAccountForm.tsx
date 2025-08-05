@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { AccountFormData, accountSchema, ACCOUNT_TYPES, CURRENCIES } from './constants';
-import { FormTextField, FormSelectField, FormNumberField } from '../form';
-import { VStack } from '../ui/vstack';
-import { Button, ButtonText } from '../ui/button';
+import { FormTextField, FormSelectField, FormNumberField } from '../../components/form';
+import { VStack } from '../../components/ui/vstack';
+import { Button, ButtonText } from '../../components/ui/button';
 
 interface CreateAccountFormProps {
   onSubmit: (data: AccountFormData) => void;
