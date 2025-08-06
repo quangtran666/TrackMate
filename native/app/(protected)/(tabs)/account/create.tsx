@@ -1,16 +1,17 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import CreateAccountForm from "@/features/account/CreateAccountForm";
-import { auth0 } from "@/config/auth0";
-import { AccountFormData } from "@/features/account/constants";
+import CreateAccountForm from "@/features/account/components/create/CreateAccountForm";
+import { useRouter } from "expo-router";
 
 export default function CreateAccountScreen() {
-  const onSubmit = async (data: AccountFormData) => {
-    const credentials = await auth0.credentialsManager.getCredentials();
+  const router = useRouter();
+  
+  const handleSuccess = () => {
+    router.push("/(protected)/(tabs)/account");
   };
 
   return (
-    <SafeAreaView>
-      <CreateAccountForm onSubmit={onSubmit} />
+    <SafeAreaView className="flex-1">
+      <CreateAccountForm onSuccess={handleSuccess} />
     </SafeAreaView>
   );
 }

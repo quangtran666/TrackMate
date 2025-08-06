@@ -1,22 +1,35 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { AccountFormData, accountSchema, ACCOUNT_TYPES, CURRENCIES } from './constants';
-import { FormTextField, FormSelectField, FormNumberField } from '../../components/form';
-import { VStack } from '../../components/ui/vstack';
-import { Button, ButtonText } from '../../components/ui/button';
+import { AccountCreationFormData, AccountCreationSchema } from '../../schemas/account.schema';
+import { ACCOUNT_TYPES, CURRENCIES } from '../../constants/account.constants';
+import { FormTextField, FormSelectField, FormNumberField } from '../../../../components/form';
+import { VStack } from '../../../../components/ui/vstack';
+import { Button, ButtonText } from '../../../../components/ui/button';
+import { Text } from '../../../../components/ui/text';
+import { useCreateAccount } from '../../queries/useCreateAccount';
 
 interface CreateAccountFormProps {
-  onSubmit: (data: AccountFormData) => void;
+  onSuccess?: () => void;
 }
 
-export function CreateAccountForm({ onSubmit }: CreateAccountFormProps) {
+export function CreateAccountForm({ onSuccess }: CreateAccountFormProps) {
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<AccountFormData>({
-    resolver: zodResolver(accountSchema),
+  } = useForm<AccountCreationFormData>({
+    resolver: zodResolver(AccountCreationSchema),
   });
+
+  const { mutateAsync, error } = useCreateAccount();
+
+  const onSubmit = async (data: AccountCreationFormData) => {
+    await mutateAsync(data, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+    });
+  };
 
   return (
     <VStack space="lg" className="p-4">
@@ -57,6 +70,12 @@ export function CreateAccountForm({ onSubmit }: CreateAccountFormProps) {
       <Button onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
         <ButtonText>{isSubmitting ? 'Creating...' : 'Create Account'}</ButtonText>
       </Button>
+
+      {error && (
+        <Text className="text-center text-red-500">
+          {error.message}
+        </Text>
+      )}
     </VStack>
   );
 }
