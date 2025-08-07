@@ -19,11 +19,7 @@ export function AccountCard({ account }: AccountCardProps) {
   return (
     <Card className="flex-row items-center justify-between">
       <View className="w-[20%] items-center">
-        <FontAwesome6
-          name={account.icon}
-          size={24}
-          color={account.color}
-        />
+        <FontAwesome6 name="money-bill-1-wave" size={24} color="black" />
       </View>
       <View className="w-[50%]">
         <Text className="text-lg font-semibold">{account.accountName}</Text>

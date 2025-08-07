@@ -6,7 +6,6 @@ export const useAccountData = () => {
   const mockAccountGroups: AccountGroup[] = [
     {
       currency: "Euro",
-      currencySymbol: "€",
       totalBalance: 10000,
       accounts: [
         {
@@ -15,8 +14,6 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         },
         {
           id: "2", 
@@ -24,14 +21,11 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         }
       ]
     },
     {
       currency: "Euro",
-      currencySymbol: "€",
       totalBalance: 10000,
       accounts: [
         {
@@ -40,8 +34,6 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         },
         {
           id: "4", 
@@ -49,14 +41,11 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         }
       ]
     },
     {
       currency: "Euro",
-      currencySymbol: "€",
       totalBalance: 10000,
       accounts: [
         {
@@ -65,8 +54,6 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         },
         {
           id: "6", 
@@ -74,14 +61,11 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         }
       ]
     },
     {
       currency: "Euro",
-      currencySymbol: "€",
       totalBalance: 10000,
       accounts: [
         {
@@ -90,8 +74,6 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         },
         {
           id: "8", 
@@ -99,8 +81,6 @@ export const useAccountData = () => {
           accountType: "EUR",
           balance: 5000,
           currency: "EUR",
-          icon: "money-bill-1-wave",
-          color: "black"
         }
       ]
     }

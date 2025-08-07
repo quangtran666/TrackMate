@@ -44,3 +44,5 @@ content>
 <line_count>35</line_count>
 </write_to_file>
 2025-08-06 12:52:00 - Implemented modular account creation feature with React Query integration and neverthrow error handling
+
+2025-08-07 12:57:26 - Added GetAccountGroups method to AccountUsecase interface with currency-based grouping logic that transforms entity accounts to AccountDisplay format and calculates total balances per currency

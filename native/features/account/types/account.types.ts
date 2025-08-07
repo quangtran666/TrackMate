@@ -22,20 +22,16 @@ export interface AccountStats {
   last_transaction_date?: string;
 }
 
-// Display types for UI components
 export interface AccountDisplay {
   id: string;
   accountName: string;
   accountType: string;
   balance: number;
   currency: string;
-  icon: string;
-  color: string;
 }
 
 export interface AccountGroup {
   currency: string;
-  currencySymbol: string;
   accounts: AccountDisplay[];
   totalBalance: number;
 }

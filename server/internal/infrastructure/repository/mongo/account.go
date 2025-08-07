@@ -6,6 +6,7 @@ import (
 
 	"github.com/quangtran666/TrackMate/internal/domain/entity"
 	mongodb "github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -33,4 +34,23 @@ func (r *AccountRepositoryImpl) Save(ctx context.Context, account *entity.Accoun
 
 	_, err := collection.InsertOne(ctx, account)
 	return err
+}
+
+func (r *AccountRepositoryImpl) GetAccountsByUserID(ctx context.Context, userID string) ([]*entity.Account, error) {
+	collection := r.db.DB.Collection(AccountCollectionName)
+
+	filter := bson.M{"user_id": userID, "is_active": true}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var accounts []*entity.Account
+	if err = cursor.All(ctx, &accounts); err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
 }

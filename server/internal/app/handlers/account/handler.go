@@ -46,3 +46,19 @@ func (h *AccountHandler) CreateAccount(c *gin.Context) {
 
 	h.CreatedResponse(c, "Account created successfully", account, h.BuildResourcePath(AccountPath, account.ID))
 }
+
+func (h *AccountHandler) GetAccountGroups(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok || userID == "" {
+		h.UnauthorizedResponse(c, "User not authenticated", nil)
+		return
+	}
+
+	accountGroups, err := h.accountUsecase.GetAccountGroups(c, userID)
+	if err != nil {
+		h.InternalServerErrorResponse(c, "Failed to retrieve account groups", err)
+		return
+	}
+
+	h.SuccessResponse(c, "Account groups retrieved successfully", accountGroups)
+}
