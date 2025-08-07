@@ -1,10 +1,9 @@
 export const ACCOUNT_TYPES = [
-  { label: 'Checking', value: 'checking' },
-  { label: 'Savings', value: 'savings' },
-  { label: 'Credit Card', value: 'credit_card' },
-  { label: 'Investment', value: 'investment' },
-  { label: 'Loan', value: 'loan' },
-  { label: 'Other', value: 'other' },
+  { label: 'Savings', value: 'Savings' },
+  { label: 'Credit Card', value: 'Credit Card' },
+  { label: 'Investment', value: 'Investment' },
+  { label: 'Loan', value: 'Loan' },
+  { label: 'Other', value: 'Other' },
 ];
 
 export const CURRENCIES = [

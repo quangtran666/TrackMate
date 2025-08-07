@@ -1,6 +1,6 @@
 // Types
 export type { Account, Balance, AccountStats } from './types/account.types';
-export type { CreateAccountRequest, CreateAccountResponse, ApiError } from './types/api.types';
+export type { CreateAccountRequest, CreateAccountResponse } from './types/api.types';
 export type { AccountDisplay, AccountGroup, AccountBalanceHeader } from './types/account.types';
 
 // Schemas
@@ -9,11 +9,9 @@ export { AccountCreationSchema, type AccountCreationFormData } from './schemas/a
 // Services
 export { AccountService } from './services/account.service';
 
-// Queries
-export { useCreateAccount } from './queries/useCreateAccount';
-
-// Hooks
-export { useAccountData } from './hooks/useAccountData';
+// Queries & Mutations
+export { useCreateAccount } from './mutations/useCreateAccount';
+export { useAccountData } from './queries/useAccountData';
 
 // Constants
 export { ACCOUNT_TYPES, CURRENCIES } from './constants/account.constants';

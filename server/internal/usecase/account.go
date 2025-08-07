@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 
 	"github.com/quangtran666/TrackMate/internal/domain/entity"
 	"github.com/quangtran666/TrackMate/internal/domain/repository"
@@ -105,6 +106,8 @@ func (u *AccountUsecaseImpl) GetAccountGroups(ctx context.Context, userID string
 	for _, group := range accountGroups {
 		result = append(result, *group)
 	}
+
+	log.Printf("Returning %d account groups", len(result))
 
 	return result, nil
 }

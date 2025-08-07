@@ -1,6 +1,7 @@
-import { useMutation, UseMutationResult } from '@tanstack/react-query';
+import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AccountService } from '../services/account.service';
-import { CreateAccountRequest, CreateAccountResponse, ApiError } from '../types/api.types';
+import { CreateAccountRequest, CreateAccountResponse } from '../types/api.types';
+import { ApiError } from '@/services/api.types';
 import { useAppToast } from '@/components/ui/toast/useAppToast';
 
 export function useCreateAccount(): UseMutationResult<
@@ -10,6 +11,7 @@ export function useCreateAccount(): UseMutationResult<
   unknown
 > {
   const toast = useAppToast();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (request: CreateAccountRequest) => {
@@ -21,6 +23,7 @@ export function useCreateAccount(): UseMutationResult<
     },
     onSuccess: (data) => {
       toast.showToast("Account created successfully", data.message, 'success');
+      queryClient.invalidateQueries({ queryKey: ['accountGroups'] });
     },
     onError: (error: ApiError) => {
       toast.showToast("Failed to create account", error.message, 'error');

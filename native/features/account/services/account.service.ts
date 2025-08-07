@@ -1,13 +1,21 @@
 import { ResultAsync, Result } from 'neverthrow';
 import api from '../../../services/api';
-import { CreateAccountRequest, CreateAccountResponse, ApiError } from '../types/api.types';
+import { CreateAccountRequest, CreateAccountResponse, AccountGroupsResponse } from '../types/api.types';
+import { ApiError } from '@/services/api.types';
 
 export class AccountService {
   static createAccount(request: CreateAccountRequest): ResultAsync<CreateAccountResponse, ApiError> {
     return ResultAsync.fromPromise(
       api.post('/accounts', request),
       (error) => this.mapApiError(error)
-    ).map(response => response.data);
+    );
+  }
+
+  static getAccountGroups(): ResultAsync<AccountGroupsResponse, ApiError> {
+    return ResultAsync.fromPromise(
+      api.get('/accounts/groups'),
+      (error) => this.mapApiError(error)
+    );
   }
 
   private static mapApiError(error: any): ApiError {

@@ -26,8 +26,9 @@ export interface AccountDisplay {
   id: string;
   accountName: string;
   accountType: string;
-  balance: number;
-  currency: string;
+  balance: Balance;
+  isActive: boolean;
+  stats: AccountStats;
 }
 
 export interface AccountGroup {

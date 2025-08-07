@@ -1,4 +1,6 @@
+import { ApiResponse } from '@/services/api.types';
 import { Account } from './account.types';
+import { AccountGroup } from './account.types';
 
 export interface CreateAccountRequest {
   accountName: string;
@@ -7,20 +9,6 @@ export interface CreateAccountRequest {
   currency: string;
 }
 
-export interface CreateAccountResponse {
-  success: boolean;
-  data: Account;
-  message: string;
-}
-
-export interface ApiError {
-  message: string;
-  code?: string;
-  details?: any;
-}
-
-export interface AccountListResponse {
-  success: boolean;
-  data: Account[];
-  message: string;
-}
+export type CreateAccountResponse = ApiResponse<Account>;
+export type AccountListResponse = ApiResponse<Account[]>;
+export type AccountGroupsResponse = ApiResponse<AccountGroup[]>;

@@ -6,7 +6,7 @@ import { FormTextField, FormSelectField, FormNumberField } from '../../../../com
 import { VStack } from '../../../../components/ui/vstack';
 import { Button, ButtonText } from '../../../../components/ui/button';
 import { Text } from '../../../../components/ui/text';
-import { useCreateAccount } from '../../queries/useCreateAccount';
+import { useCreateAccount } from '../../mutations/useCreateAccount';
 
 interface CreateAccountFormProps {
   onSuccess?: () => void;

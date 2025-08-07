@@ -10,9 +10,9 @@ interface AccountCardProps {
 
 export function AccountCard({ account }: AccountCardProps) {
   const formatBalance = () => {
-    return account.balance.toLocaleString('en-US', { 
-      minimumFractionDigits: 0, 
-      maximumFractionDigits: 0 
+    return account.balance.amount.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     });
   };
 
