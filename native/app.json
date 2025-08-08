@@ -44,7 +44,8 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "buildCacheProvider": "eas"
     },
     "extra": {
       "router": {},

@@ -1,0 +1,80 @@
+---
+alwaysApply: true
+description: Tổng quan kiến trúc và entry points cho frontend (Expo) và backend (Go/Gin) của TrackMate
+---
+### Kiến trúc tổng quát
+
+- Monorepo gồm 2 phần chính:
+  - `native/`: Ứng dụng Expo React Native (mobile/web) dùng `expo-router`, Auth0, React Query, Gluestack UI.
+  - `server/`: API server viết bằng Go (Gin), theo kiến trúc Handler → Usecase → Repository, MongoDB.
+
+### Frontend (native)
+
+- Entry chính: [native/app/_layout.tsx](mdc:native/app/_layout.tsx)
+  - Bọc ứng dụng với `Auth0Provider`, `GluestackUIProvider`, `GestureHandlerRootView`, `QueryProvider` và `Stack` của `expo-router`.
+  - Điều hướng chính gồm 2 nhóm: `(protected)` và `(auth)`.
+
+- Auth guard: [native/app/(protected)/_layout.tsx](mdc:native/app/%28protected%29/_layout.tsx)
+  - Dựa vào `useAuth0()`; nếu chưa đăng nhập sẽ `Redirect` sang `/ (auth)/sign-in`.
+
+- Tabs: [native/app/(protected)/(tabs)/_layout.tsx](mdc:native/app/%28protected%29/%28tabs%29/_layout.tsx)
+  - Màn hình: `index` (Budget), `transaction`, `account`, `insight`.
+  - Ví dụ trang: [native/app/(protected)/(tabs)/account/index.tsx](mdc:native/app/%28protected%29/%28tabs%29/account/index.tsx)
+
+- Providers:
+  - React Query: [native/providers/query-provider.tsx](mdc:native/providers/query-provider.tsx)
+  - Gluestack UI: [native/components/ui/gluestack-ui-provider/index.tsx](mdc:native/components/ui/gluestack-ui-provider/index.tsx)
+
+- API client & Auth0:
+  - Auth0 SDK & token: [native/config/auth0.ts](mdc:native/config/auth0.ts)
+  - Axios instance (thêm Bearer token tự động, trả về `response.data`): [native/services/api.ts](mdc:native/services/api.ts)
+  - Kiểu phản hồi chung: [native/services/api.types.ts](mdc:native/services/api.types.ts)
+
+- Tổ chức tính năng (ví dụ `account`): [native/features/account](mdc:native/features/account)
+  - Service gọi API: [native/features/account/services/account.service.ts](mdc:native/features/account/services/account.service.ts)
+  - Query: [native/features/account/queries/useAccountData.ts](mdc:native/features/account/queries/useAccountData.ts)
+  - Mutation: [native/features/account/mutations/useCreateAccount.ts](mdc:native/features/account/mutations/useCreateAccount.ts)
+  - Kiểu dữ liệu: [native/features/account/types/account.types.ts](mdc:native/features/account/types/account.types.ts)
+  - UI: [native/features/account/components/index/AccountScreen.tsx](mdc:native/features/account/components/index/AccountScreen.tsx)
+
+- Alias import TypeScript: [native/tsconfig.json](mdc:native/tsconfig.json)
+  - `@/*` → `native/*`
+
+- Biến môi trường Expo:
+  - `EXPO_PUBLIC_AUTH0_DOMAIN`, `EXPO_PUBLIC_AUTH0_CLIENT_ID`, `EXPO_PUBLIC_API_BASE_URL`
+
+### Backend (server)
+
+- Entry server: [server/cmd/server/main.go](mdc:server/cmd/server/main.go)
+  - Load cấu hình: [server/config/config.go](mdc:server/config/config.go)
+  - Kết nối MongoDB: [server/internal/infrastructure/database/mongo/mongodb.go](mdc:server/internal/infrastructure/database/mongo/mongodb.go)
+  - Khởi tạo và chạy HTTP server: [server/internal/app/server.go](mdc:server/internal/app/server.go)
+
+- Định tuyến & Middleware
+  - Base path: `/api/v1` ([server/internal/constants/constants.go](mdc:server/internal/constants/constants.go))
+  - Middleware Auth0 JWT: [server/internal/app/middleware/auth0.go](mdc:server/internal/app/middleware/auth0.go)
+  - Health check: `GET /health` ([server/internal/app/handlers/base.go](mdc:server/internal/app/handlers/base.go))
+  - Nhóm routes được bảo vệ: khởi tạo trong `server.go`, đăng ký Budget/Account handlers.
+
+- Ví dụ tài nguyên Account
+  - Routes: [server/internal/app/handlers/account/routes.go](mdc:server/internal/app/handlers/account/routes.go)
+    - `POST /accounts` tạo tài khoản
+    - `GET /accounts/groups` nhóm tài khoản theo currency
+  - Handler: [server/internal/app/handlers/account/handler.go](mdc:server/internal/app/handlers/account/handler.go)
+  - Usecase: [server/internal/usecase/account.go](mdc:server/internal/usecase/account.go)
+  - Repository (Mongo): [server/internal/infrastructure/repository/mongo/account.go](mdc:server/internal/infrastructure/repository/mongo/account.go)
+  - Entity: [server/internal/domain/entity/account.go](mdc:server/internal/domain/entity/account.go)
+
+- Chuẩn phản hồi API
+  - Thành công/lỗi: định nghĩa tại [server/internal/app/handlers/base.go](mdc:server/internal/app/handlers/base.go)
+  - Phù hợp với kiểu `ApiResponse<T>` ở frontend: [native/services/api.types.ts](mdc:native/services/api.types.ts)
+
+- Biến môi trường Server (đọc qua Viper, prefix `TRACKMATE_` nếu dùng env)
+  - `MONGODB_URI`, `SERVER_PORT`, `SERVER_HOST`, `ENVIRONMENT`, `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`
+
+### Luồng điển hình
+
+1) Frontend gọi `AccountService.getAccountGroups()` → Axios `GET /api/v1/accounts/groups` kèm Bearer token.
+2) Server xác thực JWT qua middleware, lấy `user_id` từ claims, truy vấn Mongo qua Repository, gom nhóm ở Usecase, trả về JSON chuẩn Response.
+3) Frontend nhận `data` theo `ApiResponse<T>`, render UI; lỗi được map và hiển thị qua Toast.
+

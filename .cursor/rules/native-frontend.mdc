@@ -1,0 +1,48 @@
+---
+globs: native/**
+description: Quy ước và định hướng cho phần Expo React Native trong thư mục native/
+---
+### Điều hướng
+
+- Dùng `expo-router` với cấu trúc route theo thư mục:
+  - `app/_layout.tsx`: cấu hình providers và 2 nhóm route `(protected)`, `(auth)`.
+  - `app/(protected)/_layout.tsx`: kiểm tra đăng nhập bằng `useAuth0`; redirect sang `/(auth)/sign-in` nếu chưa login.
+  - `app/(protected)/(tabs)/_layout.tsx`: cấu hình Tabs (`index`, `transaction`, `account`, `insight`).
+
+### Providers & thư viện nền tảng
+
+- React Query: sử dụng `QueryProvider` tại `app/_layout.tsx`.
+- UI: Gluestack + NativeWind qua `GluestackUIProvider`.
+- Gesture: bọc `GestureHandlerRootView` ở layout gốc.
+
+### Module alias TypeScript
+
+- Khai báo tại [native/tsconfig.json](mdc:native/tsconfig.json): `@/*` → `native/*`.
+- Khi import trong `native/*`, ưu tiên alias `@/` để tránh relative path.
+
+### API & Auth
+
+- Auth0 SDK: cấu hình ở [native/config/auth0.ts](mdc:native/config/auth0.ts).
+- Axios instance: [native/services/api.ts](mdc:native/services/api.ts)
+  - Tự động đính kèm `Authorization: Bearer <token>` qua interceptor.
+  - `response` được chuẩn hoá trả về `response.data`.
+
+### Tổ chức tính năng (ví dụ account)
+
+- Service: [native/features/account/services/account.service.ts](mdc:native/features/account/services/account.service.ts)
+- Queries/Mutations: [native/features/account/queries/useAccountData.ts](mdc:native/features/account/queries/useAccountData.ts), [native/features/account/mutations/useCreateAccount.ts](mdc:native/features/account/mutations/useCreateAccount.ts)
+- Components UI: [native/features/account/components/index/AccountScreen.tsx](mdc:native/features/account/components/index/AccountScreen.tsx)
+- Kiểu dữ liệu: [native/features/account/types/account.types.ts](mdc:native/features/account/types/account.types.ts)
+
+### Biến môi trường Expo
+
+- Sử dụng `process.env.EXPO_PUBLIC_*` cho FE:
+  - `EXPO_PUBLIC_API_BASE_URL`
+  - `EXPO_PUBLIC_AUTH0_DOMAIN`
+  - `EXPO_PUBLIC_AUTH0_CLIENT_ID`
+
+### Quy ước gọi API
+
+- Mọi API trả về theo `ApiResponse<T>` ([native/services/api.types.ts](mdc:native/services/api.types.ts)).
+- Bắt lỗi theo chuẩn `ApiError` và hiển thị Toast với `useAppToast`.
+

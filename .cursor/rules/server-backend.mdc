@@ -1,0 +1,38 @@
+---
+globs: server/**
+description: Kiến trúc backend Go (Gin) với phân lớp Handler → Usecase → Repository và MongoDB
+---
+### Entry & cấu hình
+
+- Entry: [server/cmd/server/main.go](mdc:server/cmd/server/main.go)
+- Cấu hình: [server/config/config.go](mdc:server/config/config.go)
+  - Đọc env qua Viper; các biến quan trọng: `MONGODB_URI`, `SERVER_PORT`, `SERVER_HOST`, `ENVIRONMENT`, `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`.
+- Kết nối MongoDB: [server/internal/infrastructure/database/mongo/mongodb.go](mdc:server/internal/infrastructure/database/mongo/mongodb.go)
+
+### Server & định tuyến
+
+- Khởi tạo router và routes: [server/internal/app/server.go](mdc:server/internal/app/server.go)
+- Base path API: `/api/v1` ([server/internal/constants/constants.go](mdc:server/internal/constants/constants.go))
+- Middleware Auth0 JWT: [server/internal/app/middleware/auth0.go](mdc:server/internal/app/middleware/auth0.go)
+- Health check: `GET /health` ([server/internal/app/handlers/base.go](mdc:server/internal/app/handlers/base.go))
+
+### Chuẩn response
+
+- Định nghĩa JSON response thành công/lỗi tại [server/internal/app/handlers/base.go](mdc:server/internal/app/handlers/base.go)
+- Phù hợp với kiểu FE `ApiResponse<T>` trong [native/services/api.types.ts](mdc:native/services/api.types.ts)
+
+### Tài nguyên Account (ví dụ chuẩn tổ chức)
+
+- Routes: [server/internal/app/handlers/account/routes.go](mdc:server/internal/app/handlers/account/routes.go)
+  - `POST /accounts` → tạo Account
+  - `GET /accounts/groups` → gom nhóm Account theo currency
+- Handler: [server/internal/app/handlers/account/handler.go](mdc:server/internal/app/handlers/account/handler.go)
+- Usecase: [server/internal/usecase/account.go](mdc:server/internal/usecase/account.go)
+- Repository (Mongo): [server/internal/infrastructure/repository/mongo/account.go](mdc:server/internal/infrastructure/repository/mongo/account.go)
+- Entity: [server/internal/domain/entity/account.go](mdc:server/internal/domain/entity/account.go)
+
+### Lưu ý triển khai
+
+- Thêm tài nguyên mới: tạo `handler`, `routes`, `usecase`, `repository`, `entity` tương ứng, đăng ký dưới nhóm protected routes trong `server.go`.
+- Lấy `user_id` sau xác thực: `middleware.GetUserID(c)`.
+
