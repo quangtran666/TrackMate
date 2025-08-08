@@ -1,12 +1,14 @@
 import React, { ComponentType } from "react";
-import { Button, ButtonIcon } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonSpinner } from "@/components/ui/button";
 import { EditIcon, TrashIcon } from "@/components/ui/icon";
 import { createMotionAnimatedComponent } from "@legendapp/motion";
 import { Alert, Pressable, PressableProps, View } from "react-native";
+import { useDeleteAccount } from "@/features/account";
 
 interface AccountCardActionsProps {
   isVisible: boolean;
   onClose: () => void;
+  accountId: string;
 }
 
 const AnimatedPressable = createMotionAnimatedComponent(
@@ -19,7 +21,9 @@ const AnimatedPressable = createMotionAnimatedComponent(
   }
 >;
 
-export function AccountCardActions({ isVisible, onClose }: AccountCardActionsProps) {
+export function AccountCardActions({ isVisible, onClose, accountId }: AccountCardActionsProps) {
+  const deleteMutation = useDeleteAccount();
+
   return (
     <AnimatedPressable
       initial={{ x: 96 }}
@@ -43,7 +47,9 @@ export function AccountCardActions({ isVisible, onClose }: AccountCardActionsPro
           size="sm"
           action="negative"
           className="w-10 px-0"
+          disabled={deleteMutation.isPending}
           onPress={() => {
+            if (deleteMutation.isPending) return;
             Alert.alert(
               "Delete this account?",
               "This action cannot be undone.",
@@ -53,8 +59,15 @@ export function AccountCardActions({ isVisible, onClose }: AccountCardActionsPro
                   text: "Delete",
                   style: "destructive",
                   onPress: () => {
-                    // TODO: Wire deletion mutation here
-                    onClose();
+                    if (deleteMutation.isPending) return;
+                    deleteMutation.mutate(
+                      { accountId },
+                      {
+                        onSettled: () => {
+                          onClose();
+                        },
+                      }
+                    );
                   },
                 },
               ]
@@ -62,7 +75,11 @@ export function AccountCardActions({ isVisible, onClose }: AccountCardActionsPro
           }}
           accessibilityLabel="Delete account"
         >
-          <ButtonIcon as={TrashIcon} size="sm" />
+          {deleteMutation.isPending ? (
+            <ButtonSpinner />
+          ) : (
+            <ButtonIcon as={TrashIcon} size="sm" />
+          )}
         </Button>
       </View>
     </AnimatedPressable>

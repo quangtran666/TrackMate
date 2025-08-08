@@ -1,6 +1,6 @@
 import { ResultAsync, Result } from 'neverthrow';
 import api from '../../../services/api';
-import { CreateAccountRequest, CreateAccountResponse, AccountGroupsResponse } from '../types/api.types';
+import { CreateAccountRequest, CreateAccountResponse, AccountGroupsResponse, DeleteAccountResponse } from '../types/api.types';
 import { ApiError } from '@/services/api.types';
 
 export class AccountService {
@@ -14,6 +14,13 @@ export class AccountService {
   static getAccountGroups(): ResultAsync<AccountGroupsResponse, ApiError> {
     return ResultAsync.fromPromise(
       api.get('/accounts/groups'),
+      (error) => this.mapApiError(error)
+    );
+  }
+
+  static deleteAccount(accountId: string): ResultAsync<DeleteAccountResponse, ApiError> {
+    return ResultAsync.fromPromise(
+      api.delete(`/accounts/${accountId}`),
       (error) => this.mapApiError(error)
     );
   }

@@ -16,7 +16,7 @@ export function AccountCard({ account }: AccountCardProps) {
       <Pressable
         onHoverIn={() => setShowActions(true)}
         onHoverOut={() => setShowActions(false)}
-        delayLongPress={300}
+        delayLongPress={300}    
         onLongPress={() => setShowActions(true)}
         onPress={() => {
           if (showActions) setShowActions(false);
@@ -28,6 +28,7 @@ export function AccountCard({ account }: AccountCardProps) {
       <AccountCardActions
         isVisible={showActions}
         onClose={() => setShowActions(false)}
+        accountId={account.id}
       />
     </View>
   );

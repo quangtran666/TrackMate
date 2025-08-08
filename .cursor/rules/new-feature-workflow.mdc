@@ -1,0 +1,66 @@
+---
+alwaysApply: true
+---
+## New Feature Development Workflow
+
+Follow this step-by-step workflow when creating a new feature. It is optimized for this monorepo’s architecture and requires using openmemory MCP for context capture.
+
+### 1) Retrieve prior context (openmemory MCP)
+- Use openmemory MCP to look for any existing context about this feature or related decisions:
+  - search-memories: search for relevant notes
+  - list-memories: review recent notes
+- If relevant context exists, summarize it for yourself before proceeding.
+- Optionally fetch project rules for architecture context:
+  - Fetch rule: `native-frontend` (Expo RN structure) → see [native/app/_layout.tsx](mdc:native/app/_layout.tsx)
+  - Fetch rule: `server-backend` (Go Gin layering) → see [server/internal/app/server.go](mdc:server/internal/app/server.go)
+
+### 2) Define the feature scope
+- Clarify user problem, entities, API endpoints, and UI flows.
+- Identify whether this is frontend-only, backend-only, or full-stack.
+- Decide on data model changes (server) and screen/components (native).
+
+### 3) Backend plan (if applicable)
+- Domain model: add or update entity in `server/internal/domain/entity/` (e.g., [server/internal/domain/entity/account.go](mdc:server/internal/domain/entity/account.go)).
+- Repository interface: define/update in `server/internal/domain/repository/`.
+- Persistence: implement in `server/internal/infrastructure/repository/mongo/` (e.g., [server/internal/infrastructure/repository/mongo/account.go](mdc:server/internal/infrastructure/repository/mongo/account.go)).
+- Usecase: add orchestration in `server/internal/usecase/` (e.g., [server/internal/usecase/account.go](mdc:server/internal/usecase/account.go)).
+- Handler + routes: create under `server/internal/app/handlers/<feature>/` and register routes (e.g., [server/internal/app/handlers/account/routes.go](mdc:server/internal/app/handlers/account/routes.go)).
+- Server wiring: ensure protected routes are registered under base path `/api/v1` (see [server/internal/constants/constants.go](mdc:server/internal/constants/constants.go) and [server/internal/app/server.go](mdc:server/internal/app/server.go)).
+- Auth: requests should pass through Auth0 middleware (see [server/internal/app/middleware/auth0.go](mdc:server/internal/app/middleware/auth0.go)).
+- Response shape: conform to standardized responses in [server/internal/app/handlers/base.go](mdc:server/internal/app/handlers/base.go) to match frontend `ApiResponse<T>` ([native/services/api.types.ts](mdc:native/services/api.types.ts)).
+
+### 4) Frontend plan (if applicable)
+- Create feature module under `native/features/<feature>/` following the existing structure (see `account` as reference):
+  - services: REST calls (e.g., [native/features/account/services/account.service.ts](mdc:native/features/account/services/account.service.ts)) using shared Axios ([native/services/api.ts](mdc:native/services/api.ts)).
+  - types: DTOs and domain types (e.g., [native/features/account/types/account.types.ts](mdc:native/features/account/types/account.types.ts)).
+  - queries/mutations: React Query hooks (e.g., [native/features/account/queries/useAccountData.ts](mdc:native/features/account/queries/useAccountData.ts), [native/features/account/mutations/useCreateAccount.ts](mdc:native/features/account/mutations/useCreateAccount.ts)).
+  - components: UI composition with Gluestack UI (e.g., [native/features/account/components/index/AccountScreen.tsx](mdc:native/features/account/components/index/AccountScreen.tsx)).
+- Screens and routing: add screens under `native/app/(protected)/` tree as needed (see [native/app/(protected)/(tabs)/_layout.tsx](mdc:native/app/%28protected%29/%28tabs%29/_layout.tsx)).
+- Providers: ensure queries run under [native/providers/query-provider.tsx](mdc:native/providers/query-provider.tsx) and UI under [native/components/ui/gluestack-ui-provider/index.tsx](mdc:native/components/ui/gluestack-ui-provider/index.tsx).
+- Auth: API calls automatically include Bearer token via the Axios instance ([native/services/api.ts](mdc:native/services/api.ts)); Auth0 config at [native/config/auth0.ts](mdc:native/config/auth0.ts).
+
+### 5) Environment & configuration
+- Backend: configure via Viper envs (prefix `TRACKMATE_`), e.g., `MONGODB_URI`, `SERVER_PORT`, `AUTH0_DOMAIN`, `AUTH0_AUDIENCE` (see [server/config/config.go](mdc:server/config/config.go)).
+- Frontend: use Expo public envs as needed: `EXPO_PUBLIC_AUTH0_DOMAIN`, `EXPO_PUBLIC_AUTH0_CLIENT_ID`, `EXPO_PUBLIC_API_BASE_URL`.
+
+### 6) Implement backend
+- Implement the entity, repository, usecase, and handler.
+- Register routes under `/api/v1/<feature>`.
+- Return standardized responses.
+- Run and verify the server starts (see [server/cmd/server/main.go](mdc:server/cmd/server/main.go)).
+
+### 7) Implement frontend
+- Create services, types, queries, mutations, and UI components.
+- Wire up screens to router; protect behind `(protected)` group.
+- Use React Query for data fetching and mutation side-effects (toast, refetch).
+
+### 9) Documentation & cleanup
+- Update any relevant README sections if behavior or setup changed.
+- Ensure code style, types, and lints pass.
+
+### 10) Save context (openmemory MCP)
+- Summarize the new feature context (feature name, key files, routes, decisions) and save it:
+  - add-memory: store a concise note linking to relevant files and endpoints.
+
+Use this workflow as a repeatable checklist for all new features to maintain consistency across `native/` and `server/` per the project architecture.
+

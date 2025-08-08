@@ -8,6 +8,7 @@ import (
 	mongodb "github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -53,4 +54,26 @@ func (r *AccountRepositoryImpl) GetAccountsByUserID(ctx context.Context, userID 
 	}
 
 	return accounts, nil
+}
+
+func (r *AccountRepositoryImpl) DeactivateAccount(ctx context.Context, userID string, accountID string) error {
+	collection := r.db.DB.Collection(AccountCollectionName)
+
+	// Ensure the account belongs to user and is currently active
+	filter := bson.M{"_id": accountID, "user_id": userID, "is_active": true}
+	update := bson.M{
+		"$set": bson.M{
+			"is_active":  false,
+			"updated_at": time.Now(),
+		},
+	}
+
+	result, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+	return nil
 }

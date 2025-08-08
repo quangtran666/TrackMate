@@ -12,3 +12,4 @@ export interface CreateAccountRequest {
 export type CreateAccountResponse = ApiResponse<Account>;
 export type AccountListResponse = ApiResponse<Account[]>;
 export type AccountGroupsResponse = ApiResponse<AccountGroup[]>;
+export type DeleteAccountResponse = ApiResponse<{ id: string }>;

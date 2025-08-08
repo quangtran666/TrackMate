@@ -62,3 +62,24 @@ func (h *AccountHandler) GetAccountGroups(c *gin.Context) {
 
 	h.SuccessResponse(c, "Account groups retrieved successfully", accountGroups)
 }
+
+func (h *AccountHandler) DeleteAccount(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok || userID == "" {
+		h.UnauthorizedResponse(c, "User not authenticated", nil)
+		return
+	}
+
+	accountID := c.Param("id")
+	if accountID == "" {
+		h.BadRequestResponse(c, "Account ID is required", nil)
+		return
+	}
+
+	if err := h.accountUsecase.DeleteAccount(c, userID, accountID); err != nil {
+		h.InternalServerErrorResponse(c, "Failed to delete account", err)
+		return
+	}
+
+	h.SuccessResponse(c, "Account deleted successfully", gin.H{"id": accountID})
+}

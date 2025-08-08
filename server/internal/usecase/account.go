@@ -11,6 +11,7 @@ import (
 type AccountUsecase interface {
 	CreateAccount(ctx context.Context, userID string, req *CreateAccountRequest) (*entity.Account, error)
 	GetAccountGroups(ctx context.Context, userID string) ([]AccountGroup, error)
+	DeleteAccount(ctx context.Context, userID string, accountID string) error
 }
 
 type CreateAccountRequest struct {
@@ -110,4 +111,8 @@ func (u *AccountUsecaseImpl) GetAccountGroups(ctx context.Context, userID string
 	log.Printf("Returning %d account groups", len(result))
 
 	return result, nil
+}
+
+func (u *AccountUsecaseImpl) DeleteAccount(ctx context.Context, userID string, accountID string) error {
+	return u.accountRepo.DeactivateAccount(ctx, userID, accountID)
 }

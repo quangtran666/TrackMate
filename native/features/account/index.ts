@@ -11,6 +11,7 @@ export { AccountService } from './services/account.service';
 
 // Queries & Mutations
 export { useCreateAccount } from './mutations/useCreateAccount';
+export { useDeleteAccount } from './mutations/useDeleteAccount';
 export { useAccountData } from './queries/useAccountData';
 
 // Constants
