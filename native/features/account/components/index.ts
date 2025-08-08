@@ -8,3 +8,4 @@ export { CreateAccountFab } from "./index/CreateAccountFab";
 
 // Create components  
 export { CreateAccountForm } from "./create/CreateAccountForm";
+export { EditAccountForm } from "./update/EditAccountForm";

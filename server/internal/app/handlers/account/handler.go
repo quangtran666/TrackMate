@@ -83,3 +83,53 @@ func (h *AccountHandler) DeleteAccount(c *gin.Context) {
 
 	h.SuccessResponse(c, "Account deleted successfully", gin.H{"id": accountID})
 }
+
+func (h *AccountHandler) GetAccountByID(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok || userID == "" {
+		h.UnauthorizedResponse(c, "User not authenticated", nil)
+		return
+	}
+
+	accountID := c.Param("id")
+	if accountID == "" {
+		h.BadRequestResponse(c, "Account ID is required", nil)
+		return
+	}
+
+	account, err := h.accountUsecase.GetAccountByID(c, userID, accountID)
+	if err != nil {
+		h.NotFoundResponse(c, "Account not found", err)
+		return
+	}
+
+	h.SuccessResponse(c, "Account retrieved successfully", account)
+}
+
+func (h *AccountHandler) UpdateAccount(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok || userID == "" {
+		h.UnauthorizedResponse(c, "User not authenticated", nil)
+		return
+	}
+
+	accountID := c.Param("id")
+	if accountID == "" {
+		h.BadRequestResponse(c, "Account ID is required", nil)
+		return
+	}
+
+	var req usecase.UpdateAccountRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.BadRequestResponse(c, "Invalid request body", err)
+		return
+	}
+
+	account, err := h.accountUsecase.UpdateAccount(c, userID, accountID, &req)
+	if err != nil {
+		h.InternalServerErrorResponse(c, "Failed to update account", err)
+		return
+	}
+
+	h.SuccessResponse(c, "Account updated successfully", account)
+}

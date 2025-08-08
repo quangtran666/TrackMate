@@ -12,7 +12,9 @@ export { AccountService } from './services/account.service';
 // Queries & Mutations
 export { useCreateAccount } from './mutations/useCreateAccount';
 export { useDeleteAccount } from './mutations/useDeleteAccount';
+export { useUpdateAccount } from './mutations/useUpdateAccount';
 export { useAccountData } from './queries/useAccountData';
+export { useAccountById } from './queries/useAccountById';
 
 // Constants
 export { ACCOUNT_TYPES, CURRENCIES } from './constants/account.constants';

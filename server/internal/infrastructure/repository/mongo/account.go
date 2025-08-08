@@ -8,7 +8,8 @@ import (
 	mongodb "github.com/quangtran666/TrackMate/internal/infrastructure/database/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	v2mongo "go.mongodb.org/mongo-driver/v2/mongo"
+	v2options "go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 var (
@@ -73,7 +74,46 @@ func (r *AccountRepositoryImpl) DeactivateAccount(ctx context.Context, userID st
 		return err
 	}
 	if result.MatchedCount == 0 {
-		return mongo.ErrNoDocuments
+		return v2mongo.ErrNoDocuments
 	}
 	return nil
+}
+
+func (r *AccountRepositoryImpl) GetAccountByID(ctx context.Context, userID string, accountID string) (*entity.Account, error) {
+	collection := r.db.DB.Collection(AccountCollectionName)
+	filter := bson.M{"_id": accountID, "user_id": userID, "is_active": true}
+	var account entity.Account
+	if err := collection.FindOne(ctx, filter).Decode(&account); err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
+func (r *AccountRepositoryImpl) UpdateAccount(
+	ctx context.Context,
+	userID string,
+	accountID string,
+	accountName string,
+	accountType string,
+	amount float64,
+	currency string,
+) (*entity.Account, error) {
+	collection := r.db.DB.Collection(AccountCollectionName)
+	filter := bson.M{"_id": accountID, "user_id": userID, "is_active": true}
+	update := bson.M{
+		"$set": bson.M{
+			"account_name":     accountName,
+			"account_type":     accountType,
+			"balance.amount":   amount,
+			"balance.currency": currency,
+			"updated_at":       time.Now(),
+		},
+	}
+	opts := v2options.FindOneAndUpdate().SetReturnDocument(v2options.After)
+
+	var updated entity.Account
+	if err := collection.FindOneAndUpdate(ctx, filter, update, opts).Decode(&updated); err != nil {
+		return nil, err
+	}
+	return &updated, nil
 }

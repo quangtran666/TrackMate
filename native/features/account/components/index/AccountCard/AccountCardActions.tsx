@@ -4,6 +4,7 @@ import { EditIcon, TrashIcon } from "@/components/ui/icon";
 import { createMotionAnimatedComponent } from "@legendapp/motion";
 import { Alert, Pressable, PressableProps, View } from "react-native";
 import { useDeleteAccount } from "@/features/account";
+import { useRouter } from "expo-router";
 
 interface AccountCardActionsProps {
   isVisible: boolean;
@@ -23,6 +24,7 @@ const AnimatedPressable = createMotionAnimatedComponent(
 
 export function AccountCardActions({ isVisible, onClose, accountId }: AccountCardActionsProps) {
   const deleteMutation = useDeleteAccount();
+  const router = useRouter();
 
   return (
     <AnimatedPressable
@@ -37,7 +39,10 @@ export function AccountCardActions({ isVisible, onClose, accountId }: AccountCar
           size="sm"
           action="secondary"
           className="w-10 px-0"
-          onPress={onClose}
+          onPress={() => {
+            onClose();
+            router.push(`/(protected)/(tabs)/account/${accountId}`);
+          }}
           accessibilityLabel="Edit account"
         >
           <ButtonIcon as={EditIcon} size="sm" />

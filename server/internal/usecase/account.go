@@ -12,6 +12,8 @@ type AccountUsecase interface {
 	CreateAccount(ctx context.Context, userID string, req *CreateAccountRequest) (*entity.Account, error)
 	GetAccountGroups(ctx context.Context, userID string) ([]AccountGroup, error)
 	DeleteAccount(ctx context.Context, userID string, accountID string) error
+	GetAccountByID(ctx context.Context, userID string, accountID string) (*entity.Account, error)
+	UpdateAccount(ctx context.Context, userID string, accountID string, req *UpdateAccountRequest) (*entity.Account, error)
 }
 
 type CreateAccountRequest struct {
@@ -28,6 +30,13 @@ type AccountDisplay struct {
 	Balance     entity.Balance      `json:"balance"`
 	IsActive    bool                `json:"isActive"`
 	Stats       entity.AccountStats `json:"stats"`
+}
+
+type UpdateAccountRequest struct {
+	AccountName string  `json:"accountName" binding:"required"`
+	AccountType string  `json:"accountType" binding:"required"`
+	Amount      float64 `json:"amount" binding:"required,gte=0"`
+	Currency    string  `json:"currency" binding:"required"`
 }
 
 type AccountGroup struct {
@@ -115,4 +124,12 @@ func (u *AccountUsecaseImpl) GetAccountGroups(ctx context.Context, userID string
 
 func (u *AccountUsecaseImpl) DeleteAccount(ctx context.Context, userID string, accountID string) error {
 	return u.accountRepo.DeactivateAccount(ctx, userID, accountID)
+}
+
+func (u *AccountUsecaseImpl) GetAccountByID(ctx context.Context, userID string, accountID string) (*entity.Account, error) {
+	return u.accountRepo.GetAccountByID(ctx, userID, accountID)
+}
+
+func (u *AccountUsecaseImpl) UpdateAccount(ctx context.Context, userID string, accountID string, req *UpdateAccountRequest) (*entity.Account, error) {
+	return u.accountRepo.UpdateAccount(ctx, userID, accountID, req.AccountName, req.AccountType, req.Amount, req.Currency)
 }
